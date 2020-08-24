@@ -1,0 +1,24 @@
+{
+  "name": "password-safe",
+  "version": "1.0.0",
+  "description": "Password Manager",
+  "main": "cli.js",
+  "dependencies": {
+    "inquirer": "^7.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mschmauder-hub/password-safe.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mschmauder-hub/password-safe/issues"
+  },
+  "homepage": "https://github.com/mschmauder-hub/password-safe#readme"
+}
