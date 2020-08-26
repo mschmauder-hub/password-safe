@@ -1,5 +1,5 @@
 const inquirer = require("inquirer");
-const { readPassword } = require("./lib/passwords");
+const { readPassword, writePassword } = require("./lib/passwords");
 const {
   askInitialQuestions,
   askGetPasswordQuestions,
@@ -10,21 +10,20 @@ const {
 const fs = require("fs").promises;
 
 async function main() {
-  const { operation } = await askInitialQuestions();
-
-  if (operation === CHOICE_GET) {
-    const { masterPassword, key } = await askGetPasswordQuestions();
-
-    if (masterPassword === "123") {
+  const { masterPassword, operation } = await askInitialQuestions();
+  if (masterPassword === "123") {
+    if (operation === CHOICE_GET) {
+      const { key } = await askGetPasswordQuestions();
       const password = await readPassword(key);
       console.log(password);
     } else {
-      console.log("password incorrect");
+      const { key, password } = await askSetPasswordQuestions();
+
+      await writePassword(key, password);
+      console.log("Password set");
     }
   } else {
-    const setPassword = await askSetPasswordQuestions();
-    const passwordsJSON = await fs.readFile("./passwords.json", "utf-8");
-    let passwords = JSON.parse(passwordsJSON);
+    console.log("password incorrect");
   }
 }
 
