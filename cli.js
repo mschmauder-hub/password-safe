@@ -18,7 +18,6 @@ async function main() {
       console.log(password);
     } else {
       const { key, password } = await askSetPasswordQuestions();
-
       await writePassword(key, password);
       console.log("Password set");
     }
