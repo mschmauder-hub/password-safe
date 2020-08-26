@@ -7,6 +7,7 @@ const {
   CHOICE_GET,
   CHOICE_SET,
 } = require("./lib/questions");
+const { encrypt, decrypt } = require("./lib/crypto");
 const fs = require("fs").promises;
 
 async function main() {
@@ -15,10 +16,14 @@ async function main() {
     if (operation === CHOICE_GET) {
       const { key } = await askGetPasswordQuestions();
       const password = await readPassword(key);
-      console.log(password);
+      const decryptedPassword = decrypt(password, masterPassword);
+      console.log(decryptedPassword);
     } else {
       const { key, password } = await askSetPasswordQuestions();
-      await writePassword(key, password);
+      const encryptedPassword = encrypt(password, masterPassword);
+
+      await writePassword(key, encryptedPassword);
+
       console.log("Password set");
     }
   } else {
