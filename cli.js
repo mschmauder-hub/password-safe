@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const {
   readPassword,
   writePassword,
@@ -14,35 +16,46 @@ const {
 } = require("./lib/questions");
 const { encrypt, decrypt, verifyHash } = require("./lib/crypto");
 
+const { MongoClient } = require("mongodb");
+
+const client = new MongoClient(process.env.MONGO_URI);
+
 async function main() {
-  const masterPassword = await readMasterPassword();
+  try {
+    await client.connect();
+    const database = client.db(process.env.MONGO_NAME);
 
-  if (!masterPassword) {
-    const { newMasterPassword } = await askForNewMasterPassword();
-    await writeMasterPassword(newMasterPassword);
-    console.log("Master Password set!");
-    return;
-  }
+    const masterPassword = await readMasterPassword();
 
-  const { masterPasswordInput, operation } = await askInitialQuestions();
+    if (!masterPassword) {
+      const { newMasterPassword } = await askForNewMasterPassword();
+      await writeMasterPassword(newMasterPassword);
+      console.log("Master Password set!");
+      return;
+    }
 
-  if (!verifyHash(masterPasswordInput, masterPassword)) {
-    console.log("password incorrect");
-    return;
-  }
+    const { masterPasswordInput, operation } = await askInitialQuestions();
 
-  if (operation === CHOICE_GET) {
-    const { key } = await askGetPasswordQuestions();
-    const password = await readPassword(key);
-    const decryptedPassword = decrypt(password, masterPasswordInput);
-    console.log(decryptedPassword);
-  } else {
-    const { key, password } = await askSetPasswordQuestions();
-    const encryptedPassword = encrypt(password, masterPasswordInput);
+    if (!verifyHash(masterPasswordInput, masterPassword)) {
+      console.log("password incorrect");
+      return;
+    }
 
-    await writePassword(key, encryptedPassword);
+    if (operation === CHOICE_GET) {
+      const { key } = await askGetPasswordQuestions();
+      const password = await readPassword(key, database);
+      const decryptedPassword = decrypt(password, masterPasswordInput);
+      console.log(decryptedPassword);
+    } else {
+      const { key, password } = await askSetPasswordQuestions();
+      const encryptedPassword = encrypt(password, masterPasswordInput);
 
-    console.log("Password set");
+      await writePassword(key, encryptedPassword, database);
+
+      console.log("Password set");
+    }
+  } finally {
+    await client.close();
   }
 }
 
