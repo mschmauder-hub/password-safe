@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const {
   readPassword,
   writePassword,
@@ -16,15 +18,12 @@ const { encrypt, decrypt, verifyHash } = require("./lib/crypto");
 
 const { MongoClient } = require("mongodb");
 
-const uri =
-  "mongodb+srv://mschmauder:ec97kBlsDiQjSc9l@development.fou8v.mongodb.net/password_safe?retryWrites=true&w=majority";
-
-const client = new MongoClient(uri);
+const client = new MongoClient(process.env.MONGO_URI);
 
 async function main() {
   try {
     await client.connect();
-    const database = client.db("password_safe");
+    const database = client.db(process.env.MONGO_NAME);
 
     const masterPassword = await readMasterPassword();
 
