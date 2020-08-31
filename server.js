@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 app.use(bodyParser.json());
+app.use(express.json());
 
 const { MongoClient } = require("mongodb");
 const createPasswordsRouter = require("./routes/passwords");
