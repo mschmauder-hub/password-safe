@@ -1,15 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const { MongoClient } = require("mongodb");
+const createPasswordsRouter = require("./routes/passwords");
+const createUsersRouter = require("./routes/users");
 
 const app = express();
 const port = 3000;
 app.use(bodyParser.json());
 app.use(express.json());
-
-const { MongoClient } = require("mongodb");
-const createPasswordsRouter = require("./routes/passwords");
-const createUsersRouter = require("./routes/users");
 
 const client = new MongoClient(process.env.MONGO_URI, {
   useUnifiedTopology: true,

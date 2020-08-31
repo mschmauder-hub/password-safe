@@ -5,14 +5,13 @@ const jwt = require("jsonwebtoken");
 function createUsersRouter(database) {
   const router = express.Router();
 
-  //   router.get("/:user")
-
-  router.post("/", async (req, res) => {
+  router.post("/login", async (req, res) => {
     const { email, password } = req.body;
-    const test = await authenticateLogin(email, password, database);
-    console.log(test);
-    const accessToken = jwt.sign(test);
-    console.log(accessToken);
+    const user = await authenticateLogin(email, password, database);
+
+    const accessToken = jwt.sign(user, "asdasdasd12e12ed1");
+
+    res.json({ accessToken });
   });
   return router;
 }
