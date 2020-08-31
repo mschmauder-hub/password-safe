@@ -21,7 +21,7 @@ async function main() {
   const database = client.db(process.env.MONGO_NAME);
 
   app.use("/api/passwords", createPasswordsRouter(database, masterPassword));
-  app.use("/users", createUsersRouter(database));
+  app.use("/api/users", createUsersRouter(database));
 
   app.listen(port, () => {
     console.log("App is listening ");

@@ -1,4 +1,5 @@
 const express = require("express");
+const { authenticateLogin } = require("../lib/login");
 
 function createUsersRouter(database) {
   const router = express.Router();
@@ -6,7 +7,9 @@ function createUsersRouter(database) {
   //   router.get("/:user")
 
   router.post("/", async (req, res) => {
-    console.log(req.body);
+    const { email, password } = req.body;
+    const jwt = await authenticateLogin(email, password, database);
+    console.log(jwt);
   });
   return router;
 }
