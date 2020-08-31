@@ -24,28 +24,33 @@ async function main() {
   await client.connect();
   const database = client.db(process.env.MONGO_NAME);
 
-  app.get("/api/passwords/:name", async (req, response) => {
-    const key = req.params.name;
-    const encryptedPassword = await readPassword(key, database);
-    const password = decrypt(encryptedPassword, masterPassword);
+  // app.use((request,))
 
-    response.send(password);
+  app.get("/api/passwords/:name", async (req, response) => {
+    try {
+      const key = req.params.name;
+      const encryptedPassword = await readPassword(key, database);
+      if (!encryptedPassword) {
+        response.status(404).send(`Password ${key} not found`);
+        return;
+      }
+
+      const password = decrypt(encryptedPassword, masterPassword);
+
+      response.send(password);
+    } catch (error) {
+      console.error(error);
+      response.status(500).send(error.message);
+    }
   });
   app.get("/passwords", async (req, res) => {
     const allPasswords = await readAllPasswords(database);
     res.send(allPasswords);
   });
 
-  app.post("/create", async (req, response) => {
-    const { key, password } = req.body;
+  app.use("/api/passwords", createPasswordsRouter(database));
 
-    const encryptedPassword = await encrypt(password, masterPassword);
-
-    await writePassword(key, encryptedPassword, database);
-  });
-
-  app.put("/update", async (req, res) => {
-    console.log("test");
+  app["patch"]("/update", async (req, res) => {
     await updatePassword(database);
     res.send("test");
   });
