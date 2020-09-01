@@ -56,7 +56,7 @@ function createPasswordsRouter(database, masterPassword, tokenSecret) {
         return;
       }
       const password = await decrypt(encryptedPassword, masterPassword);
-      response.send(password);
+      response.json(password);
     } catch (error) {
       console.error(error);
     }
