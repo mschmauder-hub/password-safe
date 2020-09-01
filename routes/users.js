@@ -5,10 +5,11 @@ const jwt = require("jsonwebtoken");
 function createUsersRouter(database, tokenSecret) {
   const router = express.Router();
 
-  router.get("/login", async (req, res) => {
+  router.get("/:name", async (req, res) => {
     try {
-      const token = req.cookies.authToken;
-      const decodedToken = jwt.verify(token, tokenSecret);
+      const { name } = req.params;
+      const { authToken } = req.cookies;
+      const decodedToken = jwt.verify(authToken, tokenSecret);
       console.log(decodedToken);
     } catch (error) {
       console.error(error);
@@ -24,16 +25,19 @@ function createUsersRouter(database, tokenSecret) {
         expiresIn: "500s",
       });
 
-      console.log(accessToken);
-
       res.setHeader(
         "Set-Cookie",
         `authToken = ${accessToken}; path=/;Max-Age=500`
       );
 
       res.send("Logged in");
+
+      if (!user) {
+        res.status(401).send("Can't verify user");
+        return;
+      }
     } catch (error) {
-      console.error(error);
+      response.status(500).send(error.message);
     }
   });
   return router;
