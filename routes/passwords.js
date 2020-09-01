@@ -7,14 +7,33 @@ const {
   updatePassword,
 } = require("../lib/passwords");
 const { decrypt, encrypt } = require("../lib/crypto");
+const jwt = require("jsonwebtoken");
 
-function createPasswordsRouter(database, masterPassword) {
+function createPasswordsRouter(database, masterPassword, tokenSecret) {
   const router = express.Router();
+
+  router.use((req, res, next) => {
+    try {
+      const { authToken } = req.cookies;
+      const user = jwt.verify(authToken, tokenSecret);
+
+      console.log(user);
+      next();
+    } catch (error) {
+      res.status(401).send("Not logged in");
+    }
+  });
 
   router.post("/", async (req, response) => {
     try {
       const { key, password } = req.body;
       const encryptedPassword = await encrypt(password, masterPassword);
+
+      const existingPassword = await readPassword(key, database);
+      if (existingPassword) {
+        response.status(409).send("Password is already set");
+        return;
+      }
       await writePassword(key, encryptedPassword, database);
       response.status(201).send(`Password ${key} Created`);
     } catch (error) {
@@ -44,17 +63,13 @@ function createPasswordsRouter(database, masterPassword) {
   });
 
   router["patch"]("/update", async (req, res) => {
-    await updatePassword(database);
-    res.send("test");
+    const { key, password } = req.body;
+    const encryptedPassword = await encrypt(password, masterPassword);
+    await updatePassword(key, encryptedPassword, database);
+    res.send("Password updated");
   });
 
   return router;
 }
 
 module.exports = createPasswordsRouter;
-
-// try {
-// } catch (error) {
-//     console.error(error);
-//     response.status(500).send(error.message);
-//   }
