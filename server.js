@@ -22,7 +22,10 @@ async function main() {
   await client.connect();
   const database = client.db(process.env.MONGO_NAME);
 
-  app.use("/api/passwords", createPasswordsRouter(database, masterPassword));
+  app.use(
+    "/api/passwords",
+    createPasswordsRouter(database, masterPassword, process.env.JWT_TOKEN)
+  );
   app.use("/api/users", createUsersRouter(database, process.env.JWT_TOKEN));
 
   app.listen(port, () => {

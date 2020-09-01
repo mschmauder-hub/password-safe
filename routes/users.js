@@ -21,6 +21,10 @@ function createUsersRouter(database, tokenSecret) {
       const { email, password } = req.body;
       const user = await authenticateLogin(email, password, database);
 
+      if (!user) {
+        res.status(401).send("Can't verify user");
+        return;
+      }
       const accessToken = jwt.sign({ user }, tokenSecret, {
         expiresIn: "500s",
       });
@@ -31,13 +35,8 @@ function createUsersRouter(database, tokenSecret) {
       );
 
       res.send("Logged in");
-
-      if (!user) {
-        res.status(401).send("Can't verify user");
-        return;
-      }
     } catch (error) {
-      response.status(500).send(error.message);
+      res.status(500).send(error.message);
     }
   });
   return router;
