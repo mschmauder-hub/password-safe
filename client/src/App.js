@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  async function login() {
+    const data = {
+      email: "something@mail.com",
+      password: "12345",
+    };
+
+    console.log(data);
+    const passwords = await fetch("/api/users/login", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    console.log(passwords);
+  }
+  login();
+
+  async function getPasswords() {
+    const response = await fetch("/api/passwords");
+    const data = await response.json();
+    console.log(data);
+  }
+  getPasswords();
+
+  return <div className="App"></div>;
 }
 
 export default App;
