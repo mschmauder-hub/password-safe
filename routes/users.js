@@ -5,17 +5,6 @@ const jwt = require("jsonwebtoken");
 function createUsersRouter(database, tokenSecret) {
   const router = express.Router();
 
-  router.get("/:name", async (req, res) => {
-    try {
-      const { name } = req.params;
-      const { authToken } = req.cookies;
-      const decodedToken = jwt.verify(authToken, tokenSecret);
-      console.log(decodedToken);
-    } catch (error) {
-      console.error(error);
-    }
-  });
-
   router.post("/login", async (req, res) => {
     try {
       const { email, password } = req.body;

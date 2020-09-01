@@ -20,8 +20,7 @@ function createPasswordsRouter(database, masterPassword, tokenSecret) {
       console.log(user);
       next();
     } catch (error) {
-      console.log("Error");
-      res.send("Not logged in");
+      res.status(401).send("Not logged in");
     }
   });
 
@@ -30,9 +29,9 @@ function createPasswordsRouter(database, masterPassword, tokenSecret) {
       const { key, password } = req.body;
       const encryptedPassword = await encrypt(password, masterPassword);
 
-      const userPassword = await readPassword(key, database);
-      if (userPassword) {
-        response.status(403).send("Password is already set");
+      const existingPassword = await readPassword(key, database);
+      if (existingPassword) {
+        response.status(409).send("Password is already set");
         return;
       }
       await writePassword(key, encryptedPassword, database);
